@@ -34,6 +34,8 @@
       max-width: 90vw;
       width: 100%;
       transition: opacity 0.6s ease;
+      overflow-y: auto;
+      max-height: 100vh;
     }
     .hidden {
       opacity: 0;
@@ -56,14 +58,12 @@
       background: #ffcccc33;
     }
     #characters {
-      position: absolute;
-      top: 10vh;
-      width: 100%;
       display: flex;
       justify-content: center;
-      align-items: flex-end;
+      align-items: center;
       gap: 20px;
-      z-index: 1;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
       pointer-events: none;
     }
     .character {
@@ -126,7 +126,7 @@
   </div>  <div class="center hidden" id="intro">
     <h2>✨ Tap to Enter the Cosmic Gateway ✨</h2>
     <div class="button" onclick="showMain()">🔮 Enter</div>
-  </div>  <div class="center hidden" id="main">
+  </div>  <div class="center hidden" id="main" style="display: flex; flex-direction: column; align-items: center;">
     <div id="characters">
       <img class="character" src="https://openmoji.org/data/color/png/618x618/1F47D.png" alt="Alien">
       <img class="character" src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" alt="Cat">
@@ -268,4 +268,274 @@
 
     draw();
   </script></body>
-      </html>
+  </html><!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Galactic Trouble</title>
+  <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Patrick Hand', cursive;
+      background: #0b0b2e;
+      color: white;
+      overflow: hidden;
+      touch-action: manipulation;
+      height: 100%;
+      max-height: 100vh;
+      overscroll-behavior: none;
+      -webkit-overflow-scrolling: touch;
+    }
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+    .center {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      padding: 10px;
+      max-width: 90vw;
+      width: 100%;
+      transition: opacity 0.6s ease;
+      overflow-y: auto;
+      max-height: 100vh;
+    }
+    .hidden {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease;
+    }
+    .button {
+      padding: 10px 20px;
+      background: #ffffff22;
+      color: pink;
+      border: 1px solid white;
+      border-radius: 20px;
+      font-size: 18px;
+      margin-top: 20px;
+      cursor: pointer;
+      transition: 0.3s;
+      user-select: none;
+    }
+    .button:hover {
+      background: #ffcccc33;
+    }
+    #characters {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      pointer-events: none;
+    }
+    .character {
+      max-width: 60px;
+      height: auto;
+      animation: float 3s ease-in-out infinite;
+    }
+    .flower-girl {
+      animation: none;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    @keyframes hearts {
+      0% { opacity: 1; transform: translateY(0) scale(1); }
+      100% { opacity: 0; transform: translateY(-200px) scale(1.5); }
+    }
+    .heart {
+      position: absolute;
+      font-size: 16px;
+      color: pink;
+      animation: hearts 5s linear forwards;
+      pointer-events: none;
+      user-select: none;
+    }
+    #secretMessage {
+      margin-top: 30px;
+      color: #ffb6c1;
+      font-size: 16px;
+      opacity: 0;
+      transition: opacity 1s;
+    }
+    #starButton {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      cursor: pointer;
+      font-size: 22px;
+      z-index: 10;
+      user-select: none;
+    }
+    #typewriter {
+      min-height: 72px;
+      margin: 20px 0;
+    }
+    ::selection { background: #ffccff55; }
+    * {
+      cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="%23ff69b4" d="M12,2C6.47,2,2,6.47,2,12s4.47,10,10,10s10-4.47,10-10S17.53,2,12,2z"/></svg>') 12 12, auto;
+    }
+    @media (max-width: 500px) {
+      h1, h2 { font-size: 20px; }
+      .button { font-size: 14px; padding: 8px 16px; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="constellation"></canvas>  <div class="center" id="loading">
+    <h2>🚀 Charging Stardust...</h2>
+  </div>  <div class="center hidden" id="intro">
+    <h2>✨ Tap to Enter the Cosmic Gateway ✨</h2>
+    <div class="button" onclick="showMain()">🔮 Enter</div>
+  </div>  <div class="center hidden" id="main" style="display: flex; flex-direction: column; align-items: center;">
+    <div id="characters">
+      <img class="character" src="https://openmoji.org/data/color/png/618x618/1F47D.png" alt="Alien">
+      <img class="character" src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" alt="Cat">
+      <img class="character flower-girl" src="https://i.pinimg.com/originals/ee/40/67/ee4067dc40c68b9dd22511c6f2fc3d47.png" alt="Flower Girl">
+    </div>
+    <h1>🌠 Welcome, Galactic Visitor 🌠</h1>
+    <p>This page is for a very special galactic troublemaker... maybe you?</p>
+    <div class="button" onclick="startTypewriter()">🌸 Click Me Gently</div>
+    <div id="typewriter"></div>
+    <div id="secretMessage">You actually made it this far? Well, I guess I should say it... you're kind of the most wonderful star I've ever met. 🌸</div>
+  </div>  <div id="starButton" onclick="starClick()">⭐</div>  <audio id="bgMusic" loop>
+    <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c020c76f6e.mp3?filename=space-ambience-110874.mp3" type="audio/mpeg">
+  </audio>  <script>
+    const music = document.getElementById('bgMusic');
+    music.volume = 0.3;
+    document.addEventListener("click", () => {
+      if (music.paused) music.play().catch(() => {});
+    }, { once: true });
+
+    const loadScreen = document.getElementById('loading');
+    const intro = document.getElementById('intro');
+    const main = document.getElementById('main');
+    setTimeout(() => {
+      loadScreen.classList.add('hidden');
+      intro.classList.remove('hidden');
+    }, 3000);
+
+    function showMain() {
+      intro.classList.add('hidden');
+      main.classList.remove('hidden');
+    }
+
+    const messages = [
+      "Who dares disturb my cosmic nap?",
+      "You again?! … okay, fine 😒",
+      "Happy birthday… you galactic troublemaker 💖"
+    ];
+    let currentMessage = 0;
+    let isTyping = false;
+    const tw = document.getElementById('typewriter');
+
+    function startTypewriter() {
+      if (isTyping) return;
+      tw.innerHTML = '';
+      currentMessage = 0;
+      typeNext();
+    }
+
+    function typeNext() {
+      isTyping = true;
+      if (currentMessage < messages.length) {
+        const msg = messages[currentMessage];
+        let i = 0;
+        const interval = setInterval(() => {
+          if (i < msg.length) {
+            tw.innerHTML += msg[i++];
+          } else {
+            clearInterval(interval);
+            currentMessage++;
+            if (currentMessage < messages.length) {
+              tw.innerHTML += '<br>';
+              setTimeout(typeNext, 800);
+            } else {
+              isTyping = false;
+            }
+          }
+        }, 60);
+      }
+    }
+
+    let clickCount = 0;
+    function starClick() {
+      clickCount++;
+      const msg = document.getElementById('secretMessage');
+      if (clickCount >= 3) msg.style.opacity = '1';
+      spawnHeartFromStar();
+    }
+
+    function spawnHeartFromStar() {
+      const btn = document.getElementById('starButton');
+      const rect = btn.getBoundingClientRect();
+      const heart = document.createElement('div');
+      heart.className = 'heart';
+      heart.innerHTML = '💖';
+      heart.style.left = rect.left + rect.width / 2 + 'px';
+      heart.style.bottom = (window.innerHeight - rect.top) + 'px';
+      document.body.appendChild(heart);
+      setTimeout(() => heart.remove(), 5000);
+    }
+
+    document.addEventListener('mousemove', e => {
+      const star = document.createElement('div');
+      star.className = 'heart';
+      star.innerHTML = '⭐';
+      star.style.left = e.pageX + 'px';
+      star.style.bottom = (window.innerHeight - e.pageY) + 'px';
+      document.body.appendChild(star);
+      setTimeout(() => star.remove(), 1000);
+    });
+
+    const canvas = document.getElementById("constellation");
+    const ctx = canvas.getContext("2d");
+    let width, height;
+    const stars = Array.from({ length: 60 }, () => ({ x: Math.random(), y: Math.random(), r: Math.random() * 1.2 }));
+
+    function resize() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+    }
+
+    window.addEventListener("resize", resize);
+    resize();
+
+    function draw() {
+      ctx.clearRect(0, 0, width, height);
+      stars.forEach(s => {
+        ctx.beginPath();
+        ctx.arc(s.x * width, s.y * height, s.r, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
+        ctx.fill();
+      });
+      for (let i = 0; i < stars.length; i++) {
+        for (let j = i + 1; j < stars.length; j++) {
+          const dx = (stars[i].x - stars[j].x) * width;
+          const dy = (stars[i].y - stars[j].y) * height;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 150) {
+            ctx.beginPath();
+            ctx.moveTo(stars[i].x * width, stars[i].y * height);
+            ctx.lineTo(stars[j].x * width, stars[j].y * height);
+            ctx.strokeStyle = `rgba(255, 255, 255, ${0.3 - dist / 500})`;
+            ctx.lineWidth = 0.5;
+            ctx.stroke();
+          }
+        }
+      }
+      requestAnimationFrame(draw);
+    }
+
+    draw();
+  </script></body>
+    </html>
