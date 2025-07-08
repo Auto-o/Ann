@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Galactic Trouble</title>
   <link href="https://fonts.googleapis.com/css2?family=Patrick+Hand&display=swap" rel="stylesheet">
   <style>
@@ -13,21 +13,26 @@
       background: #0b0b2e;
       color: white;
       overflow: hidden;
+      touch-action: manipulation;
     }
     canvas {
       position: fixed;
-      top: 0; left: 0;
+      top: 0;
+      left: 0;
       z-index: -1;
     }
     .center {
       position: absolute;
-      top: 50%; left: 50%;
+      top: 50%;
+      left: 50%;
       transform: translate(-50%, -50%);
       text-align: center;
       padding: 10px;
       max-width: 90vw;
     }
-    .hidden { display: none; }
+    .hidden { 
+      display: none; 
+    }
     .button {
       padding: 10px 20px;
       background: #ffffff22;
@@ -73,7 +78,7 @@
       bottom: 0;
       font-size: 16px;
       color: pink;
-      animation: hearts 5s linear infinite;
+      animation: hearts 5s linear forwards;
     }
     #secretMessage {
       margin-top: 30px;
@@ -87,9 +92,14 @@
       right: 20px;
       cursor: pointer;
       font-size: 22px;
+      z-index: 10;
     }
-    ::selection { background: #ffccff55; }
-    * { cursor: url('https://cur.cursors-4u.net/cursors/cur-13/cur1161.cur'), auto !important; }
+    ::selection { 
+      background: #ffccff55; 
+    }
+    * { 
+      cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="%23ff69b4" d="M12,2C6.47,2,2,6.47,2,12s4.47,10,10,10s10-4.47,10-10S17.53,2,12,2z"/></svg>') 12 12, auto; 
+    }
   </style>
 </head>
 <body>
@@ -106,9 +116,9 @@
 
   <div class="center hidden" id="main">
     <div id="characters">
-      <img class="character" src="https://openmoji.org/data/color/png/618x618/1F47D.png" alt="Alien"/>
-      <img class="character" src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" alt="Cat"/>
-      <img class="character flower-girl" src="https://i.pinimg.com/originals/ee/40/67/ee4067dc40c68b9dd22511c6f2fc3d47.png" alt="Flower Girl"/>
+      <img class="character" src="https://openmoji.org/data/color/png/618x618/1F47D.png" alt="Alien">
+      <img class="character" src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" alt="Cat">
+      <img class="character flower-girl" src="https://i.pinimg.com/originals/ee/40/67/ee4067dc40c68b9dd22511c6f2fc3d47.png" alt="Flower Girl">
     </div>
     <h1>🌠 Welcome, Galactic Visitor 🌠</h1>
     <p>This page is for a very special galactic troublemaker... maybe you?</p>
@@ -124,14 +134,28 @@
   </audio>
 
   <script>
-    document.addEventListener("click", () => {
-      const music = document.getElementById("bgMusic");
-      if (music && music.paused) music.play();
-    }, { once: true });
+    // Audio handling
+    const music = document.getElementById('bgMusic');
+    music.volume = 0.3;
+    
+    function enableAudio() {
+      if (music.paused) {
+        const playPromise = music.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(error => {
+            console.log('Audio playback prevented:', error);
+          });
+        }
+      }
+    }
 
+    document.addEventListener("click", enableAudio, { once: true });
+
+    // Screen transitions
     let loadScreen = document.getElementById('loading');
     let intro = document.getElementById('intro');
     let main = document.getElementById('main');
+    
     setTimeout(() => {
       loadScreen.classList.add('hidden');
       intro.classList.remove('hidden');
@@ -140,47 +164,63 @@
     function showMain() {
       intro.classList.add('hidden');
       main.classList.remove('hidden');
+      enableAudio();
     }
 
+    // Typewriter effect
     const messages = [
       "Who dares disturb my cosmic nap?",
       "You again?! … okay, fine 😒",
       "Happy birthday… you galactic troublemaker 💖"
     ];
-    let i = 0;
-    let charIndex = 0;
+    let currentMessage = 0;
+    let isTyping = false;
     const tw = document.getElementById('typewriter');
 
     function startTypewriter() {
-      i = 0;
-      charIndex = 0;
+      if (isTyping) return;
+      
       tw.innerHTML = '';
+      currentMessage = 0;
       typeNext();
     }
 
     function typeNext() {
-      if (i < messages.length) {
-        if (charIndex < messages[i].length) {
-          tw.innerHTML += messages[i].charAt(charIndex);
-          charIndex++;
-          setTimeout(typeNext, 60);
-        } else {
-          tw.innerHTML += '<br>';
-          i++;
-          charIndex = 0;
-          setTimeout(typeNext, 800);
-        }
+      isTyping = true;
+      
+      if (currentMessage < messages.length) {
+        const msg = messages[currentMessage];
+        let charIndex = 0;
+        
+        const typingInterval = setInterval(() => {
+          if (charIndex < msg.length) {
+            tw.innerHTML += msg.charAt(charIndex);
+            charIndex++;
+          } else {
+            clearInterval(typingInterval);
+            currentMessage++;
+            
+            if (currentMessage < messages.length) {
+              tw.innerHTML += '<br>';
+              setTimeout(typeNext, 800);
+            } else {
+              isTyping = false;
+            }
+          }
+        }, 60);
       }
     }
 
+    // Star button click counter
     let clickCount = 0;
     function starClick() {
       clickCount++;
-      if (clickCount === 3) {
+      if (clickCount >= 3) {
         document.getElementById('secretMessage').style.display = 'block';
       }
     }
 
+    // Hearts animation
     setInterval(() => {
       const heart = document.createElement('div');
       heart.className = 'heart';
@@ -190,46 +230,64 @@
       setTimeout(() => heart.remove(), 5000);
     }, 800);
 
+    // Constellation canvas
     const canvas = document.getElementById("constellation");
     const ctx = canvas.getContext("2d");
     let width, height;
+    
     const stars = [];
-    for (let i = 0; i < 100; i++) {
-      stars.push({ x: Math.random(), y: Math.random(), r: Math.random() * 1.2 });
+    for (let i = 0; i < 60; i++) {
+      stars.push({ 
+        x: Math.random(), 
+        y: Math.random(), 
+        r: Math.random() * 1.2 
+      });
     }
+    
     function resize() {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
     }
-    resize();
+    
     window.addEventListener("resize", resize);
+    resize();
+    
     function draw() {
       ctx.clearRect(0, 0, width, height);
-      for (let i = 0; i < stars.length; i++) {
-        const s = stars[i];
-        const x = s.x * width;
-        const y = s.y * height;
+      
+      // Draw stars
+      stars.forEach(star => {
+        const x = star.x * width;
+        const y = star.y * height;
+        
         ctx.beginPath();
-        ctx.arc(x, y, s.r, 0, Math.PI * 2);
-        ctx.fillStyle = "white";
+        ctx.arc(x, y, star.r, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
         ctx.fill();
+      });
+      
+      // Draw connections
+      for (let i = 0; i < stars.length; i++) {
         for (let j = i + 1; j < stars.length; j++) {
-          const s2 = stars[j];
-          const dx = (s.x - s2.x) * width;
-          const dy = (s.y - s2.y) * height;
-          const dist = dx * dx + dy * dy;
-          if (dist < 0.01 * width * height) {
+          const dx = (stars[i].x - stars[j].x) * width;
+          const dy = (stars[i].y - stars[j].y) * height;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          
+          if (dist < 150) {
             ctx.beginPath();
-            ctx.moveTo(x, y);
-            ctx.lineTo(s2.x * width, s2.y * height);
-            ctx.strokeStyle = "rgba(255,255,255,0.1)";
+            ctx.moveTo(stars[i].x * width, stars[i].y * height);
+            ctx.lineTo(stars[j].x * width, stars[j].y * height);
+            ctx.strokeStyle = `rgba(255, 255, 255, ${0.3 - dist/500})`;
+            ctx.lineWidth = 0.5;
             ctx.stroke();
           }
         }
       }
+      
       requestAnimationFrame(draw);
     }
+    
     draw();
   </script>
 </body>
-        </html>
+</html>
