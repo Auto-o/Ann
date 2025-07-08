@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
@@ -15,6 +14,9 @@
       overflow: hidden;
       touch-action: manipulation;
       height: 100%;
+      max-height: 100vh;
+      overscroll-behavior: none;
+      -webkit-overflow-scrolling: touch;
     }
     canvas {
       position: fixed;
@@ -31,9 +33,12 @@
       padding: 10px;
       max-width: 90vw;
       width: 100%;
+      transition: opacity 0.6s ease;
     }
-    .hidden { 
-      display: none; 
+    .hidden {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.6s ease;
     }
     .button {
       padding: 10px 20px;
@@ -79,7 +84,6 @@
     }
     .heart {
       position: absolute;
-      bottom: 0;
       font-size: 16px;
       color: pink;
       animation: hearts 5s linear forwards;
@@ -90,7 +94,8 @@
       margin-top: 30px;
       color: #ffb6c1;
       font-size: 16px;
-      display: none;
+      opacity: 0;
+      transition: opacity 1s;
     }
     #starButton {
       position: fixed;
@@ -105,27 +110,23 @@
       min-height: 72px;
       margin: 20px 0;
     }
-    ::selection { 
-      background: #ffccff55; 
+    ::selection { background: #ffccff55; }
+    * {
+      cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="%23ff69b4" d="M12,2C6.47,2,2,6.47,2,12s4.47,10,10,10s10-4.47,10-10S17.53,2,12,2z"/></svg>') 12 12, auto;
     }
-    * { 
-      cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="%23ff69b4" d="M12,2C6.47,2,2,6.47,2,12s4.47,10,10,10s10-4.47,10-10S17.53,2,12,2z"/></svg>') 12 12, auto; 
+    @media (max-width: 500px) {
+      h1, h2 { font-size: 20px; }
+      .button { font-size: 14px; padding: 8px 16px; }
     }
   </style>
 </head>
 <body>
-  <canvas id="constellation"></canvas>
-
-  <div class="center" id="loading">
+  <canvas id="constellation"></canvas>  <div class="center" id="loading">
     <h2>🚀 Charging Stardust...</h2>
-  </div>
-
-  <div class="center hidden" id="intro">
+  </div>  <div class="center hidden" id="intro">
     <h2>✨ Tap to Enter the Cosmic Gateway ✨</h2>
     <div class="button" onclick="showMain()">🔮 Enter</div>
-  </div>
-
-  <div class="center hidden" id="main">
+  </div>  <div class="center hidden" id="main">
     <div id="characters">
       <img class="character" src="https://openmoji.org/data/color/png/618x618/1F47D.png" alt="Alien">
       <img class="character" src="https://media.giphy.com/media/JIX9t2j0ZTN9S/giphy.gif" alt="Cat">
@@ -136,38 +137,18 @@
     <div class="button" onclick="startTypewriter()">🌸 Click Me Gently</div>
     <div id="typewriter"></div>
     <div id="secretMessage">You actually made it this far? Well, I guess I should say it... you're kind of the most wonderful star I've ever met. 🌸</div>
-  </div>
-
-  <div id="starButton" onclick="starClick()">⭐</div>
-
-  <audio id="bgMusic" loop>
+  </div>  <div id="starButton" onclick="starClick()">⭐</div>  <audio id="bgMusic" loop>
     <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c020c76f6e.mp3?filename=space-ambience-110874.mp3" type="audio/mpeg">
-    Your browser does not support the audio element.
-  </audio>
-
-  <script>
-    // Audio handling
+  </audio>  <script>
     const music = document.getElementById('bgMusic');
     music.volume = 0.3;
-    
-    function enableAudio() {
-      if (music.paused) {
-        const playPromise = music.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(error => {
-            console.log('Audio playback prevented:', error);
-          });
-        }
-      }
-    }
+    document.addEventListener("click", () => {
+      if (music.paused) music.play().catch(() => {});
+    }, { once: true });
 
-    document.addEventListener("click", enableAudio, { once: true });
-
-    // Screen transitions
-    let loadScreen = document.getElementById('loading');
-    let intro = document.getElementById('intro');
-    let main = document.getElementById('main');
-    
+    const loadScreen = document.getElementById('loading');
+    const intro = document.getElementById('intro');
+    const main = document.getElementById('main');
     setTimeout(() => {
       loadScreen.classList.add('hidden');
       intro.classList.remove('hidden');
@@ -176,10 +157,8 @@
     function showMain() {
       intro.classList.add('hidden');
       main.classList.remove('hidden');
-      enableAudio();
     }
 
-    // Typewriter effect
     const messages = [
       "Who dares disturb my cosmic nap?",
       "You again?! … okay, fine 😒",
@@ -191,7 +170,6 @@
 
     function startTypewriter() {
       if (isTyping) return;
-      
       tw.innerHTML = '';
       currentMessage = 0;
       typeNext();
@@ -199,19 +177,15 @@
 
     function typeNext() {
       isTyping = true;
-      
       if (currentMessage < messages.length) {
         const msg = messages[currentMessage];
-        let charIndex = 0;
-        
-        const typingInterval = setInterval(() => {
-          if (charIndex < msg.length) {
-            tw.innerHTML += msg.charAt(charIndex);
-            charIndex++;
+        let i = 0;
+        const interval = setInterval(() => {
+          if (i < msg.length) {
+            tw.innerHTML += msg[i++];
           } else {
-            clearInterval(typingInterval);
+            clearInterval(interval);
             currentMessage++;
-            
             if (currentMessage < messages.length) {
               tw.innerHTML += '<br>';
               setTimeout(typeNext, 800);
@@ -223,87 +197,75 @@
       }
     }
 
-    // Star button click counter
     let clickCount = 0;
     function starClick() {
       clickCount++;
-      if (clickCount >= 3) {
-        document.getElementById('secretMessage').style.display = 'block';
-      }
+      const msg = document.getElementById('secretMessage');
+      if (clickCount >= 3) msg.style.opacity = '1';
+      spawnHeartFromStar();
     }
 
-    // Hearts animation
-    setInterval(() => {
+    function spawnHeartFromStar() {
+      const btn = document.getElementById('starButton');
+      const rect = btn.getBoundingClientRect();
       const heart = document.createElement('div');
       heart.className = 'heart';
       heart.innerHTML = '💖';
-      heart.style.left = Math.random() * window.innerWidth + 'px';
+      heart.style.left = rect.left + rect.width / 2 + 'px';
+      heart.style.bottom = (window.innerHeight - rect.top) + 'px';
       document.body.appendChild(heart);
-      setTimeout(() => {
-        if (heart.parentNode) {
-          heart.parentNode.removeChild(heart);
-        }
-      }, 5000);
-    }, 800);
+      setTimeout(() => heart.remove(), 5000);
+    }
 
-    // Constellation canvas
+    document.addEventListener('mousemove', e => {
+      const star = document.createElement('div');
+      star.className = 'heart';
+      star.innerHTML = '⭐';
+      star.style.left = e.pageX + 'px';
+      star.style.bottom = (window.innerHeight - e.pageY) + 'px';
+      document.body.appendChild(star);
+      setTimeout(() => star.remove(), 1000);
+    });
+
     const canvas = document.getElementById("constellation");
     const ctx = canvas.getContext("2d");
     let width, height;
-    
-    const stars = [];
-    for (let i = 0; i < 60; i++) {
-      stars.push({ 
-        x: Math.random(), 
-        y: Math.random(), 
-        r: Math.random() * 1.2 
-      });
-    }
-    
+    const stars = Array.from({ length: 60 }, () => ({ x: Math.random(), y: Math.random(), r: Math.random() * 1.2 }));
+
     function resize() {
       width = canvas.width = window.innerWidth;
       height = canvas.height = window.innerHeight;
     }
-    
+
     window.addEventListener("resize", resize);
     resize();
-    
+
     function draw() {
       ctx.clearRect(0, 0, width, height);
-      
-      // Draw stars
-      stars.forEach(star => {
-        const x = star.x * width;
-        const y = star.y * height;
-        
+      stars.forEach(s => {
         ctx.beginPath();
-        ctx.arc(x, y, star.r, 0, Math.PI * 2);
+        ctx.arc(s.x * width, s.y * height, s.r, 0, Math.PI * 2);
         ctx.fillStyle = "rgba(255, 255, 255, 0.8)";
         ctx.fill();
       });
-      
-      // Draw connections
       for (let i = 0; i < stars.length; i++) {
         for (let j = i + 1; j < stars.length; j++) {
           const dx = (stars[i].x - stars[j].x) * width;
           const dy = (stars[i].y - stars[j].y) * height;
           const dist = Math.sqrt(dx * dx + dy * dy);
-          
           if (dist < 150) {
             ctx.beginPath();
             ctx.moveTo(stars[i].x * width, stars[i].y * height);
             ctx.lineTo(stars[j].x * width, stars[j].y * height);
-            ctx.strokeStyle = `rgba(255, 255, 255, ${0.3 - dist/500})`;
+            ctx.strokeStyle = `rgba(255, 255, 255, ${0.3 - dist / 500})`;
             ctx.lineWidth = 0.5;
             ctx.stroke();
           }
         }
       }
-      
       requestAnimationFrame(draw);
     }
-    
+
     draw();
-  </script>
-</body>
-        </html>
+  </script></body>
+      </html>
