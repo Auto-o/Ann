@@ -14,6 +14,7 @@
       color: white;
       overflow: hidden;
       touch-action: manipulation;
+      height: 100%;
     }
     canvas {
       position: fixed;
@@ -29,6 +30,7 @@
       text-align: center;
       padding: 10px;
       max-width: 90vw;
+      width: 100%;
     }
     .hidden { 
       display: none; 
@@ -43,6 +45,7 @@
       margin-top: 20px;
       cursor: pointer;
       transition: 0.3s;
+      user-select: none;
     }
     .button:hover {
       background: #ffcccc33;
@@ -56,6 +59,7 @@
       align-items: flex-end;
       gap: 20px;
       z-index: 1;
+      pointer-events: none;
     }
     .character {
       max-width: 60px;
@@ -79,6 +83,8 @@
       font-size: 16px;
       color: pink;
       animation: hearts 5s linear forwards;
+      pointer-events: none;
+      user-select: none;
     }
     #secretMessage {
       margin-top: 30px;
@@ -93,6 +99,11 @@
       cursor: pointer;
       font-size: 22px;
       z-index: 10;
+      user-select: none;
+    }
+    #typewriter {
+      min-height: 72px;
+      margin: 20px 0;
     }
     ::selection { 
       background: #ffccff55; 
@@ -131,6 +142,7 @@
 
   <audio id="bgMusic" loop>
     <source src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_c020c76f6e.mp3?filename=space-ambience-110874.mp3" type="audio/mpeg">
+    Your browser does not support the audio element.
   </audio>
 
   <script>
@@ -227,7 +239,11 @@
       heart.innerHTML = '💖';
       heart.style.left = Math.random() * window.innerWidth + 'px';
       document.body.appendChild(heart);
-      setTimeout(() => heart.remove(), 5000);
+      setTimeout(() => {
+        if (heart.parentNode) {
+          heart.parentNode.removeChild(heart);
+        }
+      }, 5000);
     }, 800);
 
     // Constellation canvas
@@ -290,4 +306,4 @@
     draw();
   </script>
 </body>
-</html>
+        </html>
